@@ -8,7 +8,7 @@ class m161219_110044_create_table_question extends Migration
     {
         $this->createTable('question', [
             'id' => $this->primaryKey(),
-            'question' => $this->string()->notNull(),
+            'question' => $this->text(),
             'answer' => $this->text(),
             'created_at' => $this->dateTime(),
             'updated_at' => $this->dateTime(),

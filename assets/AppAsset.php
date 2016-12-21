@@ -19,11 +19,17 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'css/bootstrap-multiselect.css',
+        'css/bootstrap-toggle.min.css'
     ];
     public $js = [
+        'js/bootstrap-multiselect.js',
+        'js/bootstrap-toggle.min.js'
     ];
+    public $jsOptions = ['position' => \yii\web\View::POS_HEAD];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
+        'yii\bootstrap\BootstrapPluginAsset',
     ];
 }

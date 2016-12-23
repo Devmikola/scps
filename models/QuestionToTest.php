@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "question_to_answer".
+ * This is the model class for table "question_to_test".
  *
  * @property integer $question_id
  * @property integer $test_id
@@ -13,14 +13,14 @@ use Yii;
  * @property Question $question
  * @property Test $test
  */
-class QuestionToAnswer extends \yii\db\ActiveRecord
+class QuestionToTest extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'question_to_answer';
+        return 'question_to_test';
     }
 
     /**

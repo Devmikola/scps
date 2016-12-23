@@ -12,7 +12,7 @@ use Yii;
  * @property integer $time
  * @property integer $questions_count
  *
- * @property QuestionToAnswer[] $questionToAnswers
+ * @property QuestionToTest[] $questionToAnswers
  */
 class Test extends \yii\db\ActiveRecord
 {
@@ -52,8 +52,15 @@ class Test extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getQuestionToAnswers()
+    public function getQuestionToTest()
     {
-        return $this->hasMany(QuestionToAnswer::className(), ['test_id' => 'id']);
+        return $this->hasMany(QuestionToTest::className(), ['test_id' => 'id']);
     }
+
+    public function getQuestions()
+    {
+        return $this->hasMany(Question::className(), ['id' => 'question_id'])
+            ->via('questionToTest');
+    }
+
 }

@@ -1,6 +1,10 @@
 <?php
 /* @var $this yii\web\View */
+use yii\helpers\Html;
 use yii\widgets\ActiveField;
+use yii\widgets\LinkPager;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 ?>
 
 <div class="interface-panel">
@@ -9,85 +13,82 @@ use yii\widgets\ActiveField;
             Queestions Index
         </div>
         <div class="form-group">
-            <input type="text" id="search-field" class="form-control" placeholder="Search" style="width: 400px;">
+            <input type="text" id="search-field" class="form-control" placeholder="Search" style="width: 400px;" autocomplete="off">
         </div>
 
-        <!--
-        Bootstrap Multiselect
-
-        http://davidstutz.github.io/bootstrap-multiselect/#getting-started
-        and https://github.com/davidstutz/bootstrap-multiselect
-        -->
-
         <div class="form-group">
-            <select id="example-filterBehavior" multiple="multiple">
-                <option value="1">PHP</option>
-                <option value="2">MySQL</option>
-                <option value="3">GIT</option>
-                <option value="4">JavaScript</option>
-                <option value="5">jQuery</option>
-                <option value="6">Yii 2</option>
-                <option value="7">Backbone.js</option>
+            <select id="tags-filter" name="filterTags[]" multiple="multiple">
+                <? foreach($tags as $tag) : ?>
+                    <option value="<?= $tag->id ?>"><?= $tag->name ?></option>
+                <? endforeach; ?>
             </select>
         </div>
         <div class="form-group">
-            <input type="checkbox" data-width="160" checked data-toggle="toggle" data-on="Show Answers" data-off="Hide Answers" data-onstyle="success" data-offstyle="warning">
+            <input id="showing-answer" type="checkbox" data-width="160" checked data-toggle="toggle" data-on="Show Answers" data-off="Hide Answers" data-onstyle="success" data-offstyle="warning">
         </div>
         <div class="form-group">
-            <button type="button" class="btn btn-warning">Add Question</button>
+            <?= Html::a('Add Question', ['/questions/create'], ['class'=>'btn btn-warning']) ?>
         </div>
     </form>
 </div>
 
 
-<table id="questions-table" class="table table-sm table-inverse">
-        <tr class="bg-danger">
-            <th scope="row">1</th>
-            <td colspan="2">Yii 2 installation issue</td>
-            <td>Yii 2, PHP</td>
-        </tr>
-        <tr class="bg-success">
-            <th scope="row">2</th>
-            <td colspan="2">GIT update</td>
-            <td>GIT</td>
-        </tr>
-        <tr class="bg-warning">
-            <th scope="row">3</th>
-            <td colspan="2">Optimisation requests select when using subqueries</td>
-            <td>SQL, MySQL</td>
-        </tr>
-        <tr class="bg-danger">
-            <th scope="row">4</th>
-            <td colspan="2">My Algorithm of building applications</td>
-            <td>Xtra</td>
-        </tr>
-</table>
+<!-- Including table of questions from partial -->
+<?= $this->render('_index_table', ['questions' => $questions, 'pagination' => $pagination]) ?>
 
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#example-filterBehavior').multiselect({
+        $('#tags-filter').multiselect({
             enableFiltering: true,
             enableCaseInsensitiveFiltering: true,
             filterPlaceholder: 'Search...',
             nonSelectedText: 'Tags',
+            onChange: searchRequest,
             buttonWidth: '160px'
         });
 
-        var questions_trs = $("#questions-table tr");
-        for(var i = 0, size = questions_trs.length; i < size; i++) {
-            $(questions_trs[i]).hover(function(){
-                $(this).css("background-color", changeColors($(this).css("background-color"), +10))
-            }, function(){
-                $(this).css("background-color", changeColors($(this).css("background-color"), -10))
-
+        function searchRequest() {
+            var selectedOptions = $('#tags-filter option:selected');
+            var selectedTags = selectedOptions.map(function(index, el) {return $(el).val(); }).get();
+            $.ajax({
+                url: document.location,
+                type: 'POST',
+                data: {searchTerm: $("#search-field").val(), filterTags: JSON.stringify(selectedTags)},
+                success: function(data) {
+                    $("#questions-table").html(data);
+                }
             });
         }
+
+        if(localStorage.getItem("showing-answer") == "false") {
+            $('#showing-answer').bootstrapToggle("off");
+        }
+
+        $("#showing-answer").change(function(){
+            localStorage.setItem("showing-answer", this.checked);
+        });
+
+        $("body").on("mouseenter", "#questions-table tr", function(){
+            $(this).css("background-color", changeColors($(this).css("background-color"), +15))
+        }).on("mouseleave", "#questions-table tr", function(){
+            $(this).css("background-color", changeColors($(this).css("background-color"), -15))
+        });
 
         function changeColors(str, addVal) {
             var vals = str.substring(str.indexOf('(') + 1, str.length - 1).split(', ');
             return 'rgb(' + (parseInt(vals[0]) + addVal) + ', ' + (parseInt(vals[1]) + addVal) + ', ' + (parseInt(vals[2]) + addVal) + ')';
         }
+
+        $("body").on('click', "#questions-table tr[data-href]", function(){
+            window.open($(this).data('href'), '_blank');
+        });
+
+        $("#search-field").keyup(function(){
+            if($(this).val().length > 2 || $(this).val().length == 0) {
+                searchRequest();
+            }
+        });
     });
 </script>
 

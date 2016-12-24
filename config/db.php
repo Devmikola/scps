@@ -2,14 +2,6 @@
 
 
 if(getenv("YII_ENV") == 'prod') {
-    $ret_arr = [
-        'class' => 'yii\db\Connection',
-        'dsn' => 'mysql:host=localhost;dbname=scps',
-        'username' => 'root',
-        'password' => '',
-        'charset' => 'utf8',
-    ];
-} else {
     $clearDB = parse_url(getenv("CLEARDB_DATABASE_URL"));
 
     $server = $clearDB["host"];
@@ -22,6 +14,14 @@ if(getenv("YII_ENV") == 'prod') {
         'dsn' => "mysql:host=$server;port=$port;dbname=$db",
         'username' => $username,
         'password' => $password,
+        'charset' => 'utf8',
+    ];
+} else {
+    $ret_arr = [
+        'class' => 'yii\db\Connection',
+        'dsn' => 'mysql:host=localhost;dbname=scps',
+        'username' => 'root',
+        'password' => '',
         'charset' => 'utf8',
     ];
 }

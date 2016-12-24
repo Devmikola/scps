@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use phpDocumentor\Reflection\DocBlock\Tag;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;

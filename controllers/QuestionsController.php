@@ -8,12 +8,30 @@ use app\models\Question;
 use app\models\Test;
 use app\models\Tag;
 
+use yii\filters\AccessControl;
+
 use yii\data\Pagination;
 
 use Yii;
 
 class QuestionsController extends \yii\web\Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['index', 'create', 'delete', 'update', 'view'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ]
+                ],
+            ],
+        ];
+    }
+
     public function actionCreate()
     {
         $model = new Question();
@@ -28,10 +46,6 @@ class QuestionsController extends \yii\web\Controller
                 'tags' => $tags,
             ]);
         }
-    }
-
-    public function actionTest() {
-
     }
 
     public function actionDelete()

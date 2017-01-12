@@ -96,13 +96,22 @@ class Question extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
+        if(! $this->isNewRecord) {
+            TagToQuestion::deleteAll(['question_id' => $this->id]);
+        }
+
         if(! empty($this->new_tags) ) {
             $exp_new_tags = explode(', ', $this->new_tags);
             foreach($exp_new_tags as $exp_new_tag) {
-                $current_tag_model = new \app\models\Tag();
-                $current_tag_model->name = $exp_new_tag;
-                $current_tag_model->save();
-                $this->link('tags', $current_tag_model);
+                if( ! $existing_tag = \app\models\Tag::findOne(['name' => $exp_new_tag]) ) {
+                    $current_tag_model = new \app\models\Tag();
+                    $current_tag_model->name = $exp_new_tag;
+                    $current_tag_model->save();
+                    $this->link('tags', $current_tag_model);
+                } else {
+                    $this->link('tags', $existing_tag);
+                }
+
             }
         }
         if(! empty($this->selected_tags) ) {

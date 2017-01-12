@@ -33,9 +33,12 @@ use yii\helpers\Url;
 </div>
 
 
-<!-- Including table of questions from partial -->
-<?= $this->render('_index_table', ['questions' => $questions, 'pagination' => $pagination]) ?>
+<input type="hidden" name="current-num-questions-portion" value="1" default-value="1" load-next-portion="initial-request" offset-exhausted="false">
 
+<!-- Including table of questions from partial -->
+<table id="questions-table" class="table table-sm table-inverse" style="margin-top: 20px;">
+    <?= $this->render('_index_table', ['questions' => $questions]) ?>
+</table>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -51,12 +54,32 @@ use yii\helpers\Url;
         function searchRequest() {
             var selectedOptions = $('#tags-filter option:selected');
             var selectedTags = selectedOptions.map(function(index, el) {return $(el).val(); }).get();
+            var currentNumQuestionPortion = $("input[name=current-num-questions-portion]");
+            var getNextQuestionPortion = currentNumQuestionPortion.attr("load-next-portion") == 'expectation' ? true : false;
             $.ajax({
                 url: document.location,
                 type: 'POST',
-                data: {searchTerm: $("#search-field").val(), filterTags: JSON.stringify(selectedTags)},
+                data: { searchTerm: $("#search-field").val(),
+                        filterTags: JSON.stringify(selectedTags),
+                        currentNumQuestionPortion: currentNumQuestionPortion.val(),
+                        getNextQuestionPortion: getNextQuestionPortion
+                },
                 success: function(data) {
-                    $("#questions-table").html(data);
+                    if(data == "Offset exhausted") {
+                        currentNumQuestionPortion.attr("offset-exhausted", true);
+                        currentNumQuestionPortion.attr("load-next-portion", 'all-data-loaded');
+                        return;
+                    }
+                    if(getNextQuestionPortion) {
+                        $("#questions-table tbody").append(data)
+                        currentNumQuestionPortion.val(parseInt(currentNumQuestionPortion.val()) + 1);
+                        currentNumQuestionPortion.attr("load-next-portion", 'loaded');
+                    }
+                    if(! getNextQuestionPortion){
+                        $("#questions-table tbody").html(data);
+                        currentNumQuestionPortion.val(currentNumQuestionPortion.attr("default-value"));
+                        currentNumQuestionPortion.attr("offset-exhausted", false);
+                    }
                 }
             });
         }
@@ -87,6 +110,18 @@ use yii\helpers\Url;
         $("#search-field").keyup(function(){
             if($(this).val().length > 2 || $(this).val().length == 0) {
                 searchRequest();
+            }
+        });
+
+        $("input[name=current-num-questions-portion]").change(function(){
+            searchRequest();
+        });
+
+        $(window).scroll(function() {
+            if($(window).scrollTop() + $(window).height() == $(document).height()) {
+                if($("input[name=current-num-questions-portion]").attr("offset-exhausted") == "false") {
+                    $("input[name=current-num-questions-portion]").attr("load-next-portion", 'expectation').trigger("change");
+                }
             }
         });
     });

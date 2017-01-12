@@ -16,6 +16,8 @@ use Yii;
 
 class QuestionsController extends \yii\web\Controller
 {
+    public $questionsPerPortion = 20;
+
     public function behaviors()
     {
         return [
@@ -48,19 +50,27 @@ class QuestionsController extends \yii\web\Controller
         }
     }
 
-    public function actionDelete()
+    public function actionDelete($id)
     {
-        return $this->render('delete');
+        $model = Question::findOne($id);
+        if($model) {
+            $model->delete();
+            return $this->redirect(['index']);
+        } else {
+            return $this->redirect(Yii::$app->request->referrer);
+        }
     }
 
     public function actionIndex()
     {
         $query = Question::find();
 
-        $count = $query->count();
-        $pagination = new Pagination(['totalCount' => $count, 'pageSize' => 10]);
-        $questions = $query->offset($pagination->offset)
-            ->limit($pagination->limit);
+        if(Yii::$app->request->post('getNextQuestionPortion') == 'true') {
+            $currentPortion = intval(Yii::$app->request->post('currentNumQuestionPortion'));
+        } else {
+            $currentPortion = 0;
+        }
+        $questions = $query->offset($this->questionsPerPortion * $currentPortion)->limit($this->questionsPerPortion);
 
         if(Yii::$app->request->isAjax) {
             \Yii::$app->response->format = 'json';
@@ -77,24 +87,37 @@ class QuestionsController extends \yii\web\Controller
                 }
             }
 
-            return $this->renderPartial('_index_table', [
-                'questions' => $questions->all(),
-                'pagination' => $pagination
-            ]);
+            if($queried_questions = $questions->all()) {
+                return $this->renderPartial('_index_table', [
+                    'questions' => $questions->all(),
+                ]);
+            } else {
+                return "Offset exhausted";
+            }
+
         } else {
 
             return $this->render('index', [
                 'tags' => Tag::find()->all(),
                 'questions' => $questions->all(),
-                'pagination' => $pagination
             ]);
         }
 
     }
 
-    public function actionUpdate()
+    public function actionUpdate($id)
     {
-        return $this->render('update');
+        $model = Question::findOne($id);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            $tags = Tag::find()->indexBy('id')->all();
+            return $this->render('update', [
+                'model' => $model,
+                'tags' => $tags
+            ]);
+        }
+
     }
 
     public function actionView($id)

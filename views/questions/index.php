@@ -1,45 +1,43 @@
 <?php
 /* @var $this yii\web\View */
 use yii\helpers\Html;
-use yii\widgets\ActiveField;
-use yii\widgets\LinkPager;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 ?>
 
-<div class="interface-panel">
-    <form class="navbar-form" role="search" style="background-color: #aa0000; padding: 10px; border-radius: 10px; color: #c67605;">
-        <div class="form-group" style="font-size: 20px; font-weight: bold;">
-            Queestions Index
-        </div>
-        <div class="form-group">
-            <input type="text" id="search-field" class="form-control" placeholder="Search" style="width: 400px;" autocomplete="off">
-        </div>
+<div class="container">
+    <div class="interface-panel">
+        <form class="navbar-form row" role="search">
+            <div class="col-md-2 col-xs-12">
+                <h4 class="questions-index-label">Queestions Index</h4>
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <input type="text" id="search-field" class="form-control" placeholder="Search" autocomplete="off">
+            </div>
 
-        <div class="form-group">
-            <select id="tags-filter" name="filterTags[]" multiple="multiple">
-                <? foreach($tags as $tag) : ?>
-                    <option value="<?= $tag->id ?>"><?= $tag->name ?></option>
-                <? endforeach; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <input id="showing-answer" type="checkbox" data-width="160" checked data-toggle="toggle" data-on="Show Answers" data-off="Hide Answers" data-onstyle="success" data-offstyle="warning">
-        </div>
-        <div class="form-group">
-            <?= Html::a('Add Question', ['/questions/create'], ['class'=>'btn btn-warning']) ?>
-        </div>
-    </form>
+            <div class="col-md-2 col-xs-12">
+                <select id="tags-filter" name="filterTags[]" multiple="multiple">
+                    <? foreach($tags as $tag) : ?>
+                        <option value="<?= $tag->id ?>"><?= $tag->name ?></option>
+                    <? endforeach; ?>
+                </select>
+            </div>
+            <div class="col-md-2 col-xs-12">
+                <input id="showing-answer" type="checkbox" data-width="100%" checked data-toggle="toggle" data-on="Show Answers" data-off="Hide Answers" data-onstyle="success" data-offstyle="warning">
+            </div>
+            <div class="col-md-2 col-xs-12">
+                <?= Html::a('Add Question', ['/questions/create'], ['class'=>'btn btn-warning']) ?>
+            </div>
+        </form>
+    </div>
+
+
+    <input type="hidden" name="current-num-questions-portion" value="1" default-value="1" load-next-portion="initial-request" offset-exhausted="false">
+
+    <!-- Including table of questions from partial -->
+    <table id="questions-table" class="table table-sm table-inverse">
+        <?= $this->render('_index_table', ['questions' => $questions]) ?>
+    </table>
+
 </div>
-
-
-<input type="hidden" name="current-num-questions-portion" value="1" default-value="1" load-next-portion="initial-request" offset-exhausted="false">
-
-<!-- Including table of questions from partial -->
-<table id="questions-table" class="table table-sm table-inverse" style="margin-top: 20px;">
-    <?= $this->render('_index_table', ['questions' => $questions]) ?>
-</table>
-
 <script type="text/javascript">
     $(document).ready(function() {
         $('#tags-filter').multiselect({
@@ -48,7 +46,7 @@ use yii\helpers\Url;
             filterPlaceholder: 'Search...',
             nonSelectedText: 'Tags',
             onChange: searchRequest,
-            buttonWidth: '160px'
+            buttonWidth: '100%'
         });
 
         function searchRequest() {
@@ -126,18 +124,3 @@ use yii\helpers\Url;
         });
     });
 </script>
-
-<style>
-    .multiselect-container > li > a > label {
-        padding-left: 20px;
-    }
-
-    .form-group + .form-group {
-        margin-left: 10px;
-    }
-
-
-    tr:hover {
-        cursor: pointer;
-    }
-</style>

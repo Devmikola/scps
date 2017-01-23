@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -88,7 +87,7 @@ class Question extends \yii\db\ActiveRecord
     public function getTags()
     {
         return $this->hasMany(\app\models\Tag::className(), ['id' => 'tag_id'])
-            ->via('questionToTags');
+            ->via('questionToTags')->orderBy(['id' => SORT_ASC]);
     }
 
 

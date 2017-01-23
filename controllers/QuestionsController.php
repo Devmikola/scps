@@ -2,15 +2,10 @@
 
 namespace app\controllers;
 
-use yii\helpers\VarDumper;
-
 use app\models\Question;
-use app\models\Test;
 use app\models\Tag;
 
 use yii\filters\AccessControl;
-
-use yii\data\Pagination;
 
 use Yii;
 
@@ -25,10 +20,22 @@ class QuestionsController extends \yii\web\Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'create', 'delete', 'update', 'view'],
+                        'actions' => ['index', 'create', 'update', 'view'],
                         'allow' => true,
                         'roles' => ['@'],
-                    ]
+                    ],
+                    [
+                        'actions' => ['delete'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                        'matchCallback' => function () {
+                            if (Yii::$app->user->getId() == '100') {
+                                return true;
+                            }
+                            return false;
+                        }
+                    ],
+
                 ],
             ],
         ];
@@ -52,13 +59,9 @@ class QuestionsController extends \yii\web\Controller
 
     public function actionDelete($id)
     {
-        $model = Question::findOne($id);
-        if($model) {
-            $model->delete();
-            return $this->redirect(['index']);
-        } else {
-            return $this->redirect(Yii::$app->request->referrer);
-        }
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
     }
 
     public function actionIndex()
@@ -89,7 +92,7 @@ class QuestionsController extends \yii\web\Controller
 
             if($queried_questions = $questions->all()) {
                 return $this->renderPartial('_index_table', [
-                    'questions' => $questions->all(),
+                    'questions' => $queried_questions,
                 ]);
             } else {
                 return "Offset exhausted";
@@ -107,7 +110,8 @@ class QuestionsController extends \yii\web\Controller
 
     public function actionUpdate($id)
     {
-        $model = Question::findOne($id);
+        $model = $this->findModel($id);
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -122,9 +126,20 @@ class QuestionsController extends \yii\web\Controller
 
     public function actionView($id)
     {
+        $question = $this->findModel($id);
+
         return $this->render('view', [
-            'model' => Question::findOne($id),
+            'model' => $question,
         ]);
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = Question::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
 
 }

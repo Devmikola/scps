@@ -3,10 +3,10 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\markdown\MarkdownEditor;
-use yii\helpers\ArrayHelper;
 ?>
 
-<div class="question-create">
+<div class="question-update">
+
     <h1>Add new question</h1>
 
     <div class="question-form">
@@ -20,8 +20,8 @@ use yii\helpers\ArrayHelper;
             'attribute' => 'answer',
         ]); ?>
 
-        <div class="form-group" style="margin-top: 20px;">
-            <select id="example-filterBehavior" name="Question[selected_tags][]" multiple="multiple">
+        <div class="form-group">
+            <select id="tags-filter" name="Question[selected_tags][]" multiple="multiple">
                 <?= $previously_selected_tags = (array_map(function($current){return $current->id;}, $model->tags)); ?>
 
                 <? foreach($tags as $tag) : ?>
@@ -46,7 +46,7 @@ use yii\helpers\ArrayHelper;
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#example-filterBehavior').multiselect({
+        $('#tags-filter').multiselect({
             enableFiltering: true,
             enableCaseInsensitiveFiltering: true,
             filterPlaceholder: 'Search...',

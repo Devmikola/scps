@@ -18,10 +18,11 @@ use kartik\markdown\MarkdownEditor;
         <? echo MarkdownEditor::widget([
             'model' => $model,
             'attribute' => 'answer',
+            'id' => 'question-answer-container'
         ]); ?>
 
-        <div class="form-group" style="margin-top: 20px;">
-            <select id="example-filterBehavior" name="Question[selected_tags][]" multiple="multiple">
+        <div class="form-group">
+            <select id="tags-filter" name="Question[selected_tags][]" multiple="multiple">
                 <? foreach($tags as $tag) : ?>
                     <option value="<?= $tag->id ?>"><?= $tag->name ?></option>
                 <? endforeach; ?>
@@ -42,7 +43,7 @@ use kartik\markdown\MarkdownEditor;
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#example-filterBehavior').multiselect({
+        $('#tags-filter').multiselect({
             enableFiltering: true,
             enableCaseInsensitiveFiltering: true,
             filterPlaceholder: 'Search...',

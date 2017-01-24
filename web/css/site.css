@@ -142,19 +142,9 @@ a.desc:after {
     margin-top: 20px;
 }
 
-.multiselect-container > li > a > label {
-    padding-left: 20px !important;
-}
-
 @media (max-width: 992px) {
     .col-xs-12 {
         margin-top: 20px;
-    }
-}
-
-@media (max-width: 767px) {
-    .multiselect-container > li > a > label {
-        padding-left: 40px !important;
     }
 }
 

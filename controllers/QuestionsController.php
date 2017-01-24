@@ -29,7 +29,7 @@ class QuestionsController extends \yii\web\Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function () {
-                            if (Yii::$app->user->getId() == '100') {
+                            if (Yii::$app->user->getId() == 1) {
                                 return true;
                             }
                             return false;

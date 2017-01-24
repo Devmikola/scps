@@ -51,7 +51,7 @@ use kartik\markdown\MarkdownEditor;
             enableCaseInsensitiveFiltering: true,
             filterPlaceholder: 'Search...',
             nonSelectedText: 'Tags',
-            buttonWidth: '240px'
+            buttonWidth: '160px'
         });
     });
 </script>
